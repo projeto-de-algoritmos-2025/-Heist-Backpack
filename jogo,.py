@@ -189,3 +189,74 @@ def solve_knapsack(self):
         
         self.show_solution = True
         self.game_ended = True # Jogo termina ao calcular a solução
+
+def reset_game(self):
+        """Reset do jogo"""
+        for item in self.items:
+            item.selected = False
+        
+        self.current_weight = 0
+        self.current_value = 0
+        self.error_message = ""
+        self.show_solution = False
+        self.dp_table = []
+        self.optimal_items = []
+        self.optimal_value = 0
+        self.optimal_weight = 0
+        self.game_started = False
+        self.game_ended = False
+        self.time_remaining = self.time_limit
+        self.start_time = 0
+        pygame.time.set_timer(pygame.USEREVENT + 1, 0) # Desativa o timer de erro
+    
+def draw_text(self, text, font, color, x, y, align="left"):
+        """Desenha texto na tela com alinhamento"""
+        text_surface = font.render(text, True, color)
+        text_rect = text_surface.get_rect()
+        if align == "center":
+            text_rect.center = (x, y)
+        elif align == "right":
+            text_rect.right = x
+        else:
+            text_rect.topleft = (x, y)
+        self.screen.blit(text_surface, text_rect)
+        return text_surface.get_height()
+    
+def draw_button(self, rect, text, font, bg_color, text_color, hover=False):
+        """Desenha um botão"""
+        color = BUTTON_HOVER_COLOR if hover else bg_color
+        pygame.draw.rect(self.screen, color, rect, border_radius=8)
+        pygame.draw.rect(self.screen, BORDER_COLOR, rect, 2, border_radius=8)
+        
+        self.draw_text(text, font, text_color, rect.centerx, rect.centery, align="center")
+
+def draw_item_card(self, item, rect, is_hovered):
+        bg_color = ITEM_CARD_BG
+        border_color = ITEM_CARD_BORDER_SELECTED if item.selected else ITEM_CARD_BORDER_UNSELECTED
+        
+        pygame.draw.rect(self.screen, bg_color, rect, border_radius=8)
+        pygame.draw.rect(self.screen, border_color, rect, 2, border_radius=8)
+
+        # Icon
+        icon_font = pygame.font.Font(None, 60)
+        self.draw_text(item.icon, icon_font, TEXT_COLOR, rect.centerx, rect.top + 30, align="center")
+
+        # Name
+        self.draw_text(item.name, font_medium, HEADER_COLOR, rect.centerx, rect.top + 80, align="center")
+
+        # Weight and Value
+        self.draw_text(f"Peso: {item.weight}kg", font_small, TEXT_COLOR, rect.left + 10, rect.top + 110)
+        self.draw_text(f"Valor: R$ {item.value:,.0f}", font_small, SUCCESS_COLOR, rect.left + 10, rect.top + 130)
+
+def draw_header(self):
+        self.draw_text("Heist Backpack - O Assalto Perfeito", font_title, HEADER_COLOR, WINDOW_WIDTH // 2, 40, align="center")
+
+        if self.game_started and not self.game_ended:
+            time_color = SUCCESS_COLOR if self.time_remaining > 60 else ERROR_COLOR
+            self.draw_text(f"Tempo Restante: {self.time_remaining // 60:02d}:{self.time_remaining % 60:02d}", font_medium, time_color, 50, 100)
+            self.draw_text(f"Peso Atual: {self.current_weight}/{self.max_weight} kg", font_medium, TEXT_COLOR, 350, 100)
+            self.draw_text(f"Valor Atual: R$ {self.current_value:,.0f}", font_medium, SUCCESS_COLOR, 650, 100)
+
+            if self.error_message:
+                self.draw_text(self.error_message, font_small, ERROR_COLOR, 50, 130)
+        
