@@ -78,3 +78,114 @@ class KnapsackGame:
         self.start_game_button = None
         
         self.create_buttons()
+def create_buttons(self):
+        # Botões para adicionar/remover itens
+        self.item_buttons = []
+        item_card_width = 250
+        item_card_height = 180
+        padding_x = 20
+        padding_y = 20
+        start_x = 50
+        start_y = 150
+
+        for i, item in enumerate(self.items):
+            row = i // 3  # 3 items per row
+            col = i % 3
+            x_pos = start_x + col * (item_card_width + padding_x)
+            y_pos = start_y + row * (item_card_height + padding_y)
+            button_rect = pygame.Rect(x_pos + 25, y_pos + 140, 200, 30) # Adjusted button position
+            self.item_buttons.append((button_rect, i))
+        
+        # Botão de resolver
+        self.solve_button = pygame.Rect(50, WINDOW_HEIGHT - 60, 250, 40)
+        
+        # Botão de reset
+        self.reset_button = pygame.Rect(320, WINDOW_HEIGHT - 60, 200, 40)
+
+        # Botão de iniciar jogo
+        self.start_game_button = pygame.Rect(WINDOW_WIDTH // 2 - 125, WINDOW_HEIGHT // 2 + 50, 250, 60)
+    
+def handle_click(self, pos):
+        if not self.game_started and not self.game_ended:
+            if self.start_game_button.collidepoint(pos):
+                self.start_game()
+                return
+
+        if self.game_started and not self.game_ended:
+            # Verificar cliques nos botões dos itens
+            for button_rect, item_index in self.item_buttons:
+                if button_rect.collidepoint(pos):
+                    self.toggle_item(item_index)
+                    return
+            
+            # Verificar clique no botão de resolver
+            if self.solve_button.collidepoint(pos):
+                self.solve_knapsack()
+                return
+        
+        # Verificar clique no botão de reset
+        if self.reset_button.collidepoint(pos):
+            self.reset_game()
+            return
+    
+def start_game(self):
+        self.game_started = True
+        self.start_time = pygame.time.get_ticks()  # Tempo em milissegundos
+
+def toggle_item(self, item_index):
+        item = self.items[item_index]
+        
+        if item.selected:
+            # Remover item
+            item.selected = False
+            self.current_weight -= item.weight
+            self.current_value -= item.value
+            self.error_message = ""
+        else:
+            # Tentar adicionar item
+            if self.current_weight + item.weight <= self.max_weight:
+                item.selected = True
+                self.current_weight += item.weight
+                self.current_value += item.value
+                self.error_message = ""
+            else:
+                self.error_message = "Peso excedido! Não é possível adicionar este item."
+                # Adiciona um timer para a mensagem de erro desaparecer
+                pygame.time.set_timer(pygame.USEREVENT + 1, 3000) # 3 segundos
+def solve_knapsack(self):
+        """Resolve o problema usando Programação Dinâmica"""
+        n = len(self.items)
+        w = self.max_weight
+        
+        # Criar tabela DP
+        self.dp_table = [[0 for _ in range(w + 1)] for _ in range(n + 1)]
+        
+        # Preencher tabela DP
+        for i in range(1, n + 1):
+            for weight in range(1, w + 1):
+                item = self.items[i - 1]
+                
+                if item.weight <= weight:
+                    # Pode incluir o item
+                    include_value = item.value + self.dp_table[i - 1][weight - item.weight]
+                    exclude_value = self.dp_table[i - 1][weight]
+                    self.dp_table[i][weight] = max(include_value, exclude_value);
+                else:
+                    # Não pode incluir o item
+                    self.dp_table[i][weight] = self.dp_table[i - 1][weight]
+        
+        # Reconstruir solução
+        self.optimal_value = self.dp_table[n][w]
+        self.optimal_items = []
+        self.optimal_weight = 0
+        
+        weight = w
+        for i in range(n, 0, -1):
+            if self.dp_table[i][weight] != self.dp_table[i - 1][weight]:
+                item = self.items[i - 1]
+                self.optimal_items.append(item)
+                self.optimal_weight += item.weight
+                weight -= item.weight
+        
+        self.show_solution = True
+        self.game_ended = True # Jogo termina ao calcular a solução
