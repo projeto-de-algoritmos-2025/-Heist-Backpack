@@ -358,4 +358,48 @@ def draw(self):
         else:
             self.draw_item_panel()
             self.draw_backpack_panel()
-            self.draw_solution_panel()        
+            self.draw_solution_panel()
+             # Action buttons
+            self.draw_button(self.solve_button, "Calcular Solução Ótima", font_medium, BUTTON_COLOR, BUTTON_TEXT_COLOR, self.solve_button.collidepoint(pygame.mouse.get_pos()))
+            self.draw_button(self.reset_button, "Novo Assalto", font_medium, BUTTON_COLOR, BUTTON_TEXT_COLOR, self.reset_button.collidepoint(pygame.mouse.get_pos()))
+            
+            if self.game_ended and not self.show_solution:
+                # Game over screen (time ran out)
+                overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.SRCALPHA)
+                overlay.fill((0, 0, 0, 180)) # Semi-transparent black
+                self.screen.blit(overlay, (0,0))
+                self.draw_text("⏰ TEMPO ESGOTADO! A polícia chegou!", font_title, ERROR_COLOR, WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50, align="center")
+                self.draw_text("Pressione 'Novo Assalto' para tentar novamente.", font_medium, TEXT_COLOR, WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 + 10, align="center")
+
+        pygame.display.flip()
+    
+def run(self):
+        clock = pygame.time.Clock()
+        running = True
+        
+        while running:
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                elif event.type == pygame.MOUSEBUTTONDOWN:
+                    if event.button == 1:  # Clique esquerdo
+                        self.handle_click(event.pos)
+                elif event.type == pygame.USEREVENT + 1: # Timer para mensagem de erro
+                    self.error_message = ""
+                    pygame.time.set_timer(pygame.USEREVENT + 1, 0) # Desativa o timer
+            
+            if self.game_started and not self.game_ended:
+                elapsed_time = (pygame.time.get_ticks() - self.start_time) // 1000
+                self.time_remaining = max(0, self.time_limit - elapsed_time)
+                if self.time_remaining == 0:
+                    self.game_ended = True
+
+            self.draw()
+            clock.tick(60)
+        
+        pygame.quit()
+        sys.exit()
+
+if name == "main":
+    game = KnapsackGame()
+    game.run()        
