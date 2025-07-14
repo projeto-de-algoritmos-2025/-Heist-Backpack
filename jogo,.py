@@ -259,4 +259,103 @@ def draw_header(self):
 
             if self.error_message:
                 self.draw_text(self.error_message, font_small, ERROR_COLOR, 50, 130)
+def draw_item_panel(self):
+        panel_rect = pygame.Rect(30, 150, 800, 600) # Adjusted panel size and position
+        pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect, border_radius=10)
+        pygame.draw.rect(self.screen, BORDER_COLOR, panel_rect, 2, border_radius=10)
+
+        self.draw_text("Itens no Cofre:", font_header, HEADER_COLOR, 50, 170)
+
+        item_card_width = 250
+        item_card_height = 180
+        padding_x = 20
+        padding_y = 20
+        start_x = 50
+        start_y = 200
+
+        for i, item in enumerate(self.items):
+            row = i // 3
+            col = i % 3
+            x_pos = start_x + col * (item_card_width + padding_x)
+            y_pos = start_y + row * (item_card_height + padding_y)
+            item_rect = pygame.Rect(x_pos, y_pos, item_card_width, item_card_height)
+            self.draw_item_card(item, item_rect, item_rect.collidepoint(pygame.mouse.get_pos()))
+
+            button_rect, _ = self.item_buttons[i]
+            button_text = "Remover" if item.selected else "Adicionar"
+            button_color = ERROR_COLOR if item.selected else BUTTON_COLOR
+            self.draw_button(button_rect, button_text, font_small, button_color, BUTTON_TEXT_COLOR, button_rect.collidepoint(pygame.mouse.get_pos()))
+
+def draw_backpack_panel(self):
+        panel_rect = pygame.Rect(850, 150, 320, 600) # Adjusted panel size and position
+        pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect, border_radius=10)
+        pygame.draw.rect(self.screen, BORDER_COLOR, panel_rect, 2, border_radius=10)
+
+        self.draw_text("Mochila de Fuga:", font_header, HEADER_COLOR, 870, 170)
+
+        # Weight progress bar
+        bar_x = 870
+        bar_y = 210
+        bar_width = 280
+        bar_height = 20
+        pygame.draw.rect(self.screen, (80, 80, 80), (bar_x, bar_y, bar_width, bar_height), border_radius=5)
         
+        fill_width = (self.current_weight / self.max_weight) * bar_width
+        fill_color = SUCCESS_COLOR if self.current_weight <= self.max_weight * 0.8 else ERROR_COLOR
+        pygame.draw.rect(self.screen, fill_color, (bar_x, bar_y, fill_width, bar_height), border_radius=5)
+
+        self.draw_text(f"{self.current_weight}/{self.max_weight} kg", font_small, TEXT_COLOR, bar_x + bar_width // 2, bar_y + bar_height // 2, align="center")
+
+        # Selected items list
+        self.draw_text("Itens na Mochila:", font_medium, TEXT_COLOR, 870, 250)
+        y_offset = 280
+        if not self.get_selected_items():
+            self.draw_text("Mochila vazia", font_small, (150, 150, 150), 870, y_offset)
+        else:
+            for item in self.get_selected_items():
+                self.draw_text(f"{item.icon} {item.name} ({item.weight}kg, R$ {item.value:,.0f})", font_small, TEXT_COLOR, 870, y_offset)
+                y_offset += 25
+        
+        # Total value
+        self.draw_text(f"Valor Total: R$ {self.current_value:,.0f}", font_medium, SUCCESS_COLOR, 870, y_offset + 20)
+
+def draw_solution_panel(self):
+        if self.show_solution:
+            panel_rect = pygame.Rect(30, 680, 790, 100) # Positioned below item panel
+            pygame.draw.rect(self.screen, PANEL_COLOR, panel_rect, border_radius=10)
+            pygame.draw.rect(self.screen, BORDER_COLOR, panel_rect, 2, border_radius=10)
+
+            self.draw_text("Análise da Solução:", font_header, HEADER_COLOR, 50, 700)
+
+            self.draw_text(f"Valor Ótimo: R$ {self.optimal_value:,.0f}", font_small, SUCCESS_COLOR, 50, 730)
+            self.draw_text(f"Peso Ótimo: {self.optimal_weight} kg", font_small, SUCCESS_COLOR, 50, 750)
+            
+            optimal_items_str = ", ".join([item.name for item in self.optimal_items])
+            self.draw_text(f"Itens Ótimos: {optimal_items_str}", font_tiny, TEXT_COLOR, 50, 770)
+
+            efficiency = (self.current_value / self.optimal_value * 100) if self.optimal_value > 0 else 0
+            self.draw_text(f"Sua Eficiência: {efficiency:.1f}% da Solução Ótima", font_medium, TEXT_COLOR, 400, 730)
+            if efficiency == 100:
+                self.draw_text("🎉 Parabéns! Você encontrou a solução ótima!", font_small, SUCCESS_COLOR, 400, 750)
+            elif efficiency > 0:
+                self.draw_text("💪 Continue tentando! Há espaço para melhoria.", font_small, TEXT_COLOR, 400, 750)
+            else:
+                self.draw_text("🤔 Adicione alguns itens para começar!", font_small, TEXT_COLOR, 400, 750)
+
+def get_selected_items(self):
+        return [item for item in self.items if item.selected]
+
+def draw(self):
+        self.screen.fill(BACKGROUND_COLOR)
+        
+        self.draw_header()
+
+        if not self.game_started and not self.game_ended:
+            # Initial screen
+            self.draw_text("Prepare-se para o maior assalto da história!", font_header, TEXT_COLOR, WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 50, align="center")
+            self.draw_text(f"Você tem {self.time_limit // 60} minutos para organizar sua mochila de fuga.", font_medium, TEXT_COLOR, WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2 - 10, align="center")
+            self.draw_button(self.start_game_button, "Iniciar Assalto", font_header, BUTTON_COLOR, BUTTON_TEXT_COLOR, self.start_game_button.collidepoint(pygame.mouse.get_pos()))
+        else:
+            self.draw_item_panel()
+            self.draw_backpack_panel()
+            self.draw_solution_panel()        
