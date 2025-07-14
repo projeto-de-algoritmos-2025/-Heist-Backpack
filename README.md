@@ -1,6 +1,12 @@
 # 🎮 Heist Backpack - O Assalto Perfeito (Versão Pygame)
 
 Um jogo simples em Python com interface gráfica (Pygame) que implementa o algoritmo **Knapsack (Problema da Mochila)**, com uma narrativa de assaltantes organizando uma mochila de fuga.
+## Alunos
+| Matrícula   | Aluno                             |
+|------------|-----------------------------------|
+| 22/2006196 | Wallyson Paulo Costa Souza        |
+| 22/2006893 | Kaio Macedo Santana               |
+
 
 ## 🚀 Como Executar
 
